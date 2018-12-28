@@ -1,44 +1,109 @@
 #include <ESP8266WiFi.h>
+#include <ESP8266WiFiMulti.h>
 #include <FirebaseArduino.h>
 
-#define FIREBASE_HOST ""
-#define FIREBASE_AUTH ""
-#define WIFI_SSID ""
-#define WIFI_PASSWORD ""
+#define FIREBASE_HOST "uvas-studio.firebaseio.com"
+#define FIREBASE_AUTH "99f1tP31pKnda4ORx4Ba4gtuO8Uda9Epj2HrjqDr"
+#define WIFI_SSID "MOVISTAR_0BB0"
+#define WIFI_PASSWORD "Kgbn4EkKtsJdbGCfx7XD"
 #define LED D0            // Led in NodeMCU at pin GPIO16 (D0).
+
+ESP8266WiFiMulti wifiMulti;
+boolean connectioWasAlive = true;
+boolean connection = false;
+int n;
 
 void setup() {
   // put your setup code here, to run once:
 
-  pinMode(LED, OUTPUT);    // LED pin as output.
   Serial.begin(9600);
- WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.println("Connecting");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-     delay(400);
-  }
-  Serial.println("Connected");
-  Serial.println(WiFi.localIP());
+  //wifiMulti.addAP("Laxus", "illdoit1");
+  //wifiMulti.addAP("MOVISTAR_0BB0", "Kgbn4EkKtsJdbGCfx7XD");
+  //wifiMulti.addAP("iPhone de Gfjf", "12345678");
+  wifiMulti.addAP("LG K8 (2017)", "12345678");
 
-  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
-  //Firebase.set("LIGHT_STATUS",0);
+  /*
+  Serial.print("Connecting Wifi ...");
+  if(wifiMulti.run() != WL_CONNECTED ){
+    Serial.println("");
+    Serial.println("Wifi Connected");
+    Serial.println("Ip Adress:");
+    Serial.println(WiFi.localIP());
+    Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+    }
+    */
+
+    Serial.println();
+    Serial.println();
+    Serial.print("Wait for WiFi...");
+
+    while(wifiMulti.run() != WL_CONNECTED) {
+        Serial.print(".");
+        delay(100);
+    }
+
+    if(wifiMulti.run() == WL_CONNECTED ){
+      connectioWasAlive = false;
+      Serial.printf(" connected to %s\n", WiFi.SSID().c_str());
+      Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+      }
+  int n=0;
 }
 
-int n=0;
+
 
 void loop() {
   // put your main code here, to run repeatedly:
-n=Firebase.getInt("LIGHT_STATUS");
-
-    if (n==1) {
-    digitalWrite(D0,LOW); 
-    delay(10);
-              }
-
-    if (n==0) {
-    digitalWrite(D0,HIGH); 
-    delay(10);
-
-              }
+ //monitorWiFi();
+if(wifiMulti.run() != WL_CONNECTED ){
+  
+    Serial.print(".");
+    if (connectioWasAlive == true)
+    {
+      connectioWasAlive = false;
+      Serial.print("Looking for WiFi.");
+    }
+    Serial.print(".");
+    delay(500);
+  }
+ else{
+  
+  if (connectioWasAlive == false || connection == true)
+  {
+    
+   if(connection == false || connectioWasAlive == false){
+      connection = true;
+      Serial.printf(" connected to %s\n", WiFi.SSID().c_str());
+      if(Firebase.failed()){
+        Serial.print("restarting.");
+        ESP.restart();
+        delay(100);
+        }
+      
+      
+    }else{
+      n=Firebase.getInt("LIGHT_STATUS");
+      Serial.println(n);
+      switch (n){
+         case 1:  {digitalWrite(D0,LOW);  break;}
+         case 0: {digitalWrite(D0,HIGH); break;}
+      }
+        delay(500);
+      }
+      connectioWasAlive = true;
+  }
+  
+  } 
 }
+
+/*
+else{
+  n=Firebase.getInt("LIGHT_STATUS");
+  Serial.print(n);
+
+ switch (n){
+  case 1:  {digitalWrite(D0,LOW);  break;}
+  case 0: {digitalWrite(D0,HIGH); break;}
+  }
+  delay(500);
+  }*/
