@@ -2,10 +2,10 @@
 #include <ESP8266WiFiMulti.h>
 #include <FirebaseArduino.h>
 
-#define FIREBASE_HOST "uvas-studio.firebaseio.com"
-#define FIREBASE_AUTH "99f1tP31pKnda4ORx4Ba4gtuO8Uda9Epj2HrjqDr"
-#define WIFI_SSID "MOVISTAR_0BB0"
-#define WIFI_PASSWORD "Kgbn4EkKtsJdbGCfx7XD"
+#define FIREBASE_HOST ""
+#define FIREBASE_AUTH ""
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
 #define LED D0            // Led in NodeMCU at pin GPIO16 (D0).
 
 ESP8266WiFiMulti wifiMulti;
@@ -17,10 +17,10 @@ void setup() {
   // put your setup code here, to run once:
 
   Serial.begin(9600);
-  //wifiMulti.addAP("Laxus", "illdoit1");
-  //wifiMulti.addAP("MOVISTAR_0BB0", "Kgbn4EkKtsJdbGCfx7XD");
-  //wifiMulti.addAP("iPhone de Gfjf", "12345678");
-  wifiMulti.addAP("LG K8 (2017)", "12345678");
+  /*wifiMulti.addAP("Laxus", "illdoit1");
+  wifiMulti.addAP("MOVISTAR_0BB0", "Kgbn4EkKtsJdbGCfx7XD");
+  wifiMulti.addAP("iPhone de Gfjf", "12345678");
+  wifiMulti.addAP("LG K8 (2017)", "12345678");*/
 
   /*
   Serial.print("Connecting Wifi ...");
