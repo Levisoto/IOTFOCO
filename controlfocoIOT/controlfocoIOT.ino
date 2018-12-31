@@ -3,10 +3,10 @@
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 
-#define WIFI_SSID ""
-#define WIFI_PASSWORD ""
-#define LED D0
-//int LED = 2;            // Led in NodeMCU at pin GPIO16 (D0).
+#define WIFI_SSID "MOVISTAR_0BB0"
+#define WIFI_PASSWORD "Kgbn4EkKtsJdbGCfx7XD"
+#define LED D0  // Led in NodeMCU at pin GPIO16 (D0).
+
 
 const char* host = "level-studio.herokuapp.com";
 const int httpsPort = 443;
@@ -14,8 +14,6 @@ const int httpsPort = 443;
 // Use web browser to view and copy
 // SHA1 fingerprint of the certificate
 const char* fingerprint = "08 3B 71 72 02 43 6E CA ED 42 86 93 BA 7E DF 81 C4 BC 62 30";
-
-
 
 
 ESP8266WiFiMulti wifiMulti;
@@ -28,41 +26,23 @@ void setup() {
 
   Serial.begin(9600);
   pinMode(LED, OUTPUT); 
-  wifiMulti.addAP("Laxus", "illdoit1");
-  //wifiMulti.addAP("MOVISTAR_0BB0", "Kgbn4EkKtsJdbGCfx7XD");
-  //wifiMulti.addAP("LG K8 (2017)", "12345678");
-  
-  //wifiMulti.addAP("iPhone de Gfjf", "12345678");
 
-  /*
-  Serial.print("Connecting Wifi ...");
-  if(wifiMulti.run() != WL_CONNECTED ){
-    Serial.println("");
-    Serial.println("Wifi Connected");
-    Serial.println("Ip Adress:");
-    Serial.println(WiFi.localIP());
-    Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
-    }
-    */
-
-    Serial.println();
     Serial.println();
     Serial.print("Wait for WiFi...");
+WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.println("Connecting");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(400);
+  }
+  
+  Serial.println("Connected");
+  Serial.println(WiFi.localIP());
 
-    while(wifiMulti.run() != WL_CONNECTED) {
-        Serial.print(".");
-        delay(100);
-    }
 
-    if(wifiMulti.run() == WL_CONNECTED ){
-      connectioWasAlive = false;
-      Serial.printf(" connected to %s\n", WiFi.SSID().c_str());
-      }
-
-    
+  connectioWasAlive = false;
+wifiMulti.addAP("Laxus", "illdoit1");
 }
-
-
 
 void loop() {
 WiFiClientSecure client;
@@ -104,7 +84,7 @@ if(wifiMulti.run() != WL_CONNECTED ){
                  "\r\n"
                 );
          }
-         
+         else { Serial.println("Error with server"); return;}
       unsigned long timeout = millis();
       while (client.available() == 0) {
         if (millis() - timeout > 5000) {
