@@ -5,14 +5,15 @@
 
 #define WIFI_SSID ""
 #define WIFI_PASSWORD ""
-int LED = 2;            // Led in NodeMCU at pin GPIO16 (D0).
+#define LED D0
+//int LED = 2;            // Led in NodeMCU at pin GPIO16 (D0).
 
-const char* host = "uvas-studio.firebaseapp.com";
+const char* host = "level-studio.herokuapp.com";
 const int httpsPort = 443;
 
 // Use web browser to view and copy
 // SHA1 fingerprint of the certificate
-const char* fingerprint = "E5 4E 5F CA 79 3E 5C C8 51 D0 F7 EC FC CA 28 E8 77 C1 04 C1";
+const char* fingerprint = "08 3B 71 72 02 43 6E CA ED 42 86 93 BA 7E DF 81 C4 BC 62 30";
 
 
 
@@ -27,9 +28,9 @@ void setup() {
 
   Serial.begin(9600);
   pinMode(LED, OUTPUT); 
-  /*wifiMulti.addAP("Laxus", "illdoit1");
-  wifiMulti.addAP("MOVISTAR_0BB0", "Kgbn4EkKtsJdbGCfx7XD");*/
-  wifiMulti.addAP("LG K8 (2017)", "12345678");
+  wifiMulti.addAP("Laxus", "illdoit1");
+  //wifiMulti.addAP("MOVISTAR_0BB0", "Kgbn4EkKtsJdbGCfx7XD");
+  //wifiMulti.addAP("LG K8 (2017)", "12345678");
   
   //wifiMulti.addAP("iPhone de Gfjf", "12345678");
 
@@ -97,7 +98,7 @@ if(wifiMulti.run() != WL_CONNECTED ){
           Serial.println("connected]");
           String url = "/api/lightStatus";
           Serial.println("[Sending a request]");
-          client.print(String("GET /") + url + " HTTP/1.1\r\n" +
+          client.print(String("GET /") + " HTTP/1.1\r\n" +
                  "Host: " + host + "\r\n" +
                  "Connection: close\r\n" +
                  "\r\n"
@@ -129,8 +130,8 @@ if(wifiMulti.run() != WL_CONNECTED ){
         Serial.println(TPS);
 
         switch (TPS){
-         case 1:  {digitalWrite(LED,LOW);  Serial.print("LOW");break;}
-         case 0: {digitalWrite(LED,HIGH); Serial.print("HIGHT");break;}
+         case 1:  {digitalWrite(D0,LOW);  Serial.print("LOW");break;}
+         case 0: {digitalWrite(D0,HIGH); Serial.print("HIGHT");break;}
         }
 
       }
