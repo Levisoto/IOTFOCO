@@ -1,15 +1,19 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
-#include <ESP8266HTTPClient.h>
+#include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 
-#define FIREBASE_HOST "uvas-studio.firebaseio.com"
-#define FIREBASE_AUTH "99f1tP31pKnda4ORx4Ba4gtuO8Uda9Epj2HrjqDr"
 #define WIFI_SSID ""
 #define WIFI_PASSWORD ""
 int LED = 2;            // Led in NodeMCU at pin GPIO16 (D0).
 
-const char* host = "192.168.43.216";
+const char* host = "uvas-studio.firebaseapp.com";
+const int httpsPort = 443;
+
+// Use web browser to view and copy
+// SHA1 fingerprint of the certificate
+const char* fingerprint = "E5 4E 5F CA 79 3E 5C C8 51 D0 F7 EC FC CA 28 E8 77 C1 04 C1";
+
 
 
 
@@ -60,7 +64,8 @@ void setup() {
 
 
 void loop() {
-WiFiClient client;
+WiFiClientSecure client;
+
 if(wifiMulti.run() != WL_CONNECTED ){
   
     Serial.print(".");
@@ -80,14 +85,19 @@ if(wifiMulti.run() != WL_CONNECTED ){
       Serial.printf(" connected to %s\n", WiFi.SSID().c_str());     
       Serial.println("true");
     }else{
-
+      
       Serial.print("connecting to ");
       Serial.println(host);
-      if (client.connect(host, 3000)) {
+      if (client.connect(host,httpsPort)) {
+        if (client.verify(fingerprint, host)) {
+            Serial.println("certificate matches");
+            } else {
+            Serial.println("certificate doesn't match");
+        }
           Serial.println("connected]");
-
+          String url = "/api/lightStatus";
           Serial.println("[Sending a request]");
-          client.print(String("GET /") + " HTTP/1.1\r\n" +
+          client.print(String("GET /") + url + " HTTP/1.1\r\n" +
                  "Host: " + host + "\r\n" +
                  "Connection: close\r\n" +
                  "\r\n"
@@ -131,32 +141,10 @@ if(wifiMulti.run() != WL_CONNECTED ){
       client.stop();
 
       delay(1000); // execute once every 5 minutes, don't flood remote service
-      
-   
 
-       /*JsonObject& root = jsonBuffer.parseObject(line);
-          int TPS = root["lightStatus"];
-          Serial.println(TPS);*/
-     
-        /*switch (payload){
-         case 1:  {digitalWrite(2,LOW);  break;}
-         case 0: {digitalWrite(2,HIGH); break;}
-        }*/
       }
       connectioWasAlive = true;
     }
     
   }
 }
-
-/*
-else{
-  n=Firebase.getInt("LIGHT_STATUS");
-  Serial.print(n);
-
- switch (n){
-  case 1:  {digitalWrite(D0,LOW);  break;}
-  case 0: {digitalWrite(D0,HIGH); break;}
-  }
-  delay(500);
-  }*/
