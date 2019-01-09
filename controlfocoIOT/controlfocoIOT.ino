@@ -2,9 +2,12 @@
 #include <ESP8266WiFiMulti.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
+#include<FirebaseArduino.h>
+#define FIREBASE_HOST "uvas-studio.firebaseio.com"
+#define FIREBASE_AUTH "99f1tP31pKnda4ORx4Ba4gtuO8Uda9Epj2HrjqDr"  
 
-#define WIFI_SSID "MOVISTAR_0BB0"
-#define WIFI_PASSWORD "Kgbn4EkKtsJdbGCfx7XD"
+char* WIFI_SSID = "Laxus";
+char* WIFI_PASSWORD = "illdoit1";
 #define LED D0  // Led in NodeMCU at pin GPIO16 (D0).
 
 
@@ -29,7 +32,7 @@ void setup() {
 
     Serial.println();
     Serial.print("Wait for WiFi...");
-WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.println("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
@@ -38,12 +41,15 @@ WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   
   Serial.println("Connected");
   Serial.println(WiFi.localIP());
-  
+  Firebase.begin(FIREBASE_HOST,FIREBASE_AUTH);
   connectioWasAlive = false;
 }
 
 void loop() {
 WiFiClientSecure client;
+
+String WIFI_SSID2 = Firebase.getString("SSID");  
+String WIFI_PASSWORD2 =Firebase.getString("PASSWORD");  
 
 
   while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(192,168,1,1)) {
@@ -51,7 +57,8 @@ WiFiClientSecure client;
     if (connectioWasAlive == true)
     {
       connectioWasAlive = false;
-      WiFi.reconnect();
+     
+      WiFi.begin(WIFI_SSID2, WIFI_PASSWORD2);
       Serial.print("Looking for WiFi.");
     }
     Serial.print(".");
