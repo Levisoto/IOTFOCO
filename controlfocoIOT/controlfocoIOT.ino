@@ -3,8 +3,8 @@
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 #include<FirebaseArduino.h>
-#define FIREBASE_HOST ""
-#define FIREBASE_AUTH ""  
+#define FIREBASE_HOST "your host"
+#define FIREBASE_AUTH "your authentication"  
 #define MY_SIZE 2
 
 #define LED D6  // Led in NodeMCU at pin GPIO16 (D0).
