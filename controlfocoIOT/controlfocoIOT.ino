@@ -3,13 +3,11 @@
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 #include<FirebaseArduino.h>
-#define FIREBASE_HOST "uvas-studio.firebaseio.com"
-#define FIREBASE_AUTH "99f1tP31pKnda4ORx4Ba4gtuO8Uda9Epj2HrjqDr"  
+#define FIREBASE_HOST ""
+#define FIREBASE_AUTH ""  
+#define MY_SIZE 2
 
-char* WIFI_SSID = "Laxus";
-char* WIFI_PASSWORD = "illdoit1";
-#define LED D0  // Led in NodeMCU at pin GPIO16 (D0).
-
+#define LED D6  // Led in NodeMCU at pin GPIO16 (D0).
 
 const char* host = "level-studio.herokuapp.com";
 const int httpsPort = 443;
@@ -18,6 +16,14 @@ const int httpsPort = 443;
 // SHA1 fingerprint of the certificate
 const char* fingerprint = "08 3B 71 72 02 43 6E CA ED 42 86 93 BA 7E DF 81 C4 BC 62 30";
 
+String NAME;
+String PASS; 
+String ssdi[2];
+String pass[2];
+
+
+int analogPin = A0;   // potentiometer connected to analog pin
+int val = 0;  
 
 ESP8266WiFiMulti wifiMulti;
 boolean connectioWasAlive = true;
@@ -27,44 +33,73 @@ int n;
 void setup() {
   // put your setup code here, to run once:
 
-  Serial.begin(9600);
-  pinMode(LED, OUTPUT); 
 
+    Serial.begin(9600);
+    pinMode(LED, OUTPUT); 
+    
     Serial.println();
     Serial.print("Wait for WiFi...");
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.println("Connecting");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    delay(400);
-  }
-  
-  Serial.println("Connected");
-  Serial.println(WiFi.localIP());
-  Firebase.begin(FIREBASE_HOST,FIREBASE_AUTH);
-  connectioWasAlive = false;
+    WiFi.begin("Laxus","illdoit1");
+
+    while(WiFi.status() != WL_CONNECTED) {
+        Serial.print(".");
+        delay(500);
+    }
+
+    if(WiFi.status() == WL_CONNECTED) {
+        Firebase.begin(FIREBASE_HOST,FIREBASE_AUTH);
+        while(NAME==""){
+        NAME = Firebase.getString("SSID");  
+        PASS =Firebase.getString("PASSWORD"); 
+        delay(500);
+        }
+    WiFi.disconnect();
+
+    ssdi[0]="Laxus";
+    pass[0]="illdoit1";
+    ssdi[1]=NAME;
+    pass[1]=PASS;
+    
+    }
+}
+
+
+void conectToWifi(String ssdi[], String pass[]){
+  for(int i=0; i< MY_SIZE && (WiFi.status() != WL_CONNECTED); i++){
+     
+     if(WiFi.status() == WL_CONNECTED) {Serial.println("Conected");}
+     else{
+      WiFi.begin(ssdi[i].c_str(),pass[i].c_str());
+     Serial.println("Connecting" + ssdi[i]+".");
+       for(int j=0; j< 15 && (WiFi.status() != WL_CONNECTED); j++){
+         Serial.print(".");
+         delay(500);
+      }
+      Serial.println("");
+
+     }
+      
+  } 
 }
 
 void loop() {
 WiFiClientSecure client;
 
-String WIFI_SSID2 = Firebase.getString("SSID");  
-String WIFI_PASSWORD2 =Firebase.getString("PASSWORD");  
 
-
-  while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(192,168,1,1)) {
-    
+if(WiFi.status() != WL_CONNECTED ){
+  conectToWifi(ssdi,pass);
+    Serial.print(".");
     if (connectioWasAlive == true)
     {
       connectioWasAlive = false;
-     
-      WiFi.begin(WIFI_SSID2, WIFI_PASSWORD2);
       Serial.print("Looking for WiFi.");
     }
     Serial.print(".");
     delay(500);
   }
-
+  else{
+    
+  
   if (connectioWasAlive == false || connection == true)
   {
    if(connection == false || connectioWasAlive == false){
@@ -116,8 +151,8 @@ String WIFI_PASSWORD2 =Firebase.getString("PASSWORD");
         Serial.println(TPS);
 
         switch (TPS){
-         case 0:  {digitalWrite(D0,LOW);  Serial.print("LOW");break;}
-         case 1: {digitalWrite(D0,HIGH); Serial.print("HIGHT");break;}
+         case 0:  {digitalWrite(LED,LOW);  Serial.print("LOW");break;}
+         case 1: {val = analogRead(analogPin);analogWrite(LED, val / 4); Serial.print("HIGHT");break;}
         }
 
       }
@@ -132,5 +167,5 @@ String WIFI_PASSWORD2 =Firebase.getString("PASSWORD");
       }
       connectioWasAlive = true;
     }
-    
+  } 
 }
